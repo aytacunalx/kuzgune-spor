@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KUZGUN E-SPOR | Geleceğin Arenası</title>
-    
-    <!-- Google Fonts: Orbitron ve Rajdhani -->
+    <title>KUZGUN E-SPOR | Komuta Merkezi</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tailwind Config -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -25,8 +23,10 @@
                         neonBlue: '#00f3ff',
                         neonPurple: '#bc13fe',
                         neonRed: '#ff003c',
+                        neonGreen: '#39ff14',
+                        neonYellow: '#fff01f',
                         darkBg: '#050505',
-                        panelBg: 'rgba(10, 10, 20, 0.75)'
+                        panelBg: 'rgba(12, 12, 16, 0.85)'
                     },
                     fontFamily: {
                         orbitron: ['Orbitron', 'sans-serif'],
@@ -35,12 +35,17 @@
                     animation: {
                         'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'glitch': 'glitch 1s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
                     },
                     keyframes: {
                         glitch: {
                             '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
                             '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
                             '62%': { transform: 'translate(0,0) skew(5deg)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
@@ -49,54 +54,30 @@
     </script>
 
     <style>
-        /* Global Reset & Base */
         body {
             background-color: #050505;
             color: #ffffff;
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
-            cursor: crosshair; /* Oyun nişangahı hissi */
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00f3ff;
-            border-radius: 4px;
+            cursor: crosshair;
         }
 
-        /* Canvas Background */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.6;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 3px; }
 
-        /* Neon Glow Text */
-        .neon-text-blue {
-            text-shadow: 0 0 5px #00f3ff, 0 0 10px #00f3ff, 0 0 20px #00f3ff;
-        }
-        .neon-text-purple {
-            text-shadow: 0 0 5px #bc13fe, 0 0 10px #bc13fe;
-        }
-        .neon-text-red {
-            text-shadow: 0 0 5px #ff003c, 0 0 10px #ff003c;
-        }
+        /* Neon Glow Utilities */
+        .neon-text-blue { text-shadow: 0 0 5px #00f3ff, 0 0 10px rgba(0, 243, 255, 0.5); }
+        .neon-text-purple { text-shadow: 0 0 5px #bc13fe, 0 0 10px rgba(188, 19, 254, 0.5); }
+        .neon-text-red { text-shadow: 0 0 5px #ff003c, 0 0 10px rgba(255, 0, 60, 0.5); }
+        .neon-border-blue { box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 5px rgba(0, 243, 255, 0.1); }
 
-        /* HUD Borders & Panels */
+        /* HUD Panel Design */
         .hud-panel {
-            background: rgba(10, 12, 16, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(10, 12, 16, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             clip-path: polygon(
                 0 0, 
@@ -107,52 +88,25 @@
             );
             transition: all 0.3s ease;
         }
-        
         .hud-panel:hover {
-            border-color: #00f3ff;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-            transform: translateY(-5px);
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
         }
 
-        .hud-corner {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border: 2px solid #00f3ff;
-            transition: all 0.3s;
-        }
+        /* Decorative Corners */
+        .hud-corner { position: absolute; width: 8px; height: 8px; border: 2px solid #00f3ff; transition: all 0.3s; pointer-events: none; }
         .tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
         .tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
         .bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; }
         .br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
 
-        /* Loader Animation */
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: opacity 0.8s ease-out;
-        }
-        
-        .scanline {
+        /* Chart Container */
+        .chart-container {
+            position: relative;
             width: 100%;
-            height: 100px;
-            z-index: 10;
-            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 243, 255, 0.1) 50%, rgba(0,0,0,0) 100%);
-            opacity: 0.1;
-            position: absolute;
-            bottom: 100%;
-            animation: scanline 10s linear infinite;
-            pointer-events: none;
-        }
-        @keyframes scanline {
-            0% { bottom: 100%; }
-            100% { bottom: -100%; }
+            height: 300px;
+            max-height: 350px;
+            margin: 0 auto;
         }
 
         /* Glitch Button */
@@ -167,525 +121,1059 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.4s;
         }
-        .btn-glitch:hover::before {
-            left: 100%;
+        .btn-glitch:hover::before { left: 100%; }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.15;
         }
 
-        /* Game Card Image Hover */
-        .game-card-img {
-            transition: transform 0.5s ease;
+        /* Inventory Grid Item */
+        .inv-item {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.2s;
         }
-        .game-card:hover .game-card-img {
-            transform: scale(1.1);
+        .inv-item:hover {
+            border-color: #39ff14;
+            background: rgba(57, 255, 20, 0.05);
+            box-shadow: inset 0 0 15px rgba(57, 255, 20, 0.1);
         }
 
-        /* Custom Selection */
-        ::selection {
-            background: #00f3ff;
-            color: #000;
+        /* Loot Box Animation */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-box { animation: shake 0.5s; animation-iteration-count: infinite; }
+
+        /* --- YENİ EKLENENLER: OYUN KÜTÜPHANESİ CSS --- */
+        .marquee-wrapper {
+            overflow: hidden;
+            user-select: none;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .marquee-content {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 30s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-50% - 1rem)); }
+        }
+
+        .game-card {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            border-color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .game-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, black, transparent);
+            padding: 20px 10px 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .game-card:hover .game-overlay {
+            transform: translateY(0);
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="selection:bg-neonBlue selection:text-black">
 
-    <!-- CANVAS BACKGROUND -->
-    <canvas id="bg-canvas"></canvas>
+<div class="scanlines"></div>
 
-    <!-- SCANLINE OVERLAY -->
-    <div class="scanline"></div>
+<canvas id="bgCanvas" class="fixed top-0 left-0 w-full h-full -z-10 opacity-40"></canvas>
 
-    <!-- LOADER -->
-    <div id="loader">
-        <div class="text-center">
-            <h1 class="font-orbitron text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neonBlue to-neonPurple animate-pulse mb-4 tracking-widest">
-                KUZGUN
-            </h1>
-            <div class="w-64 h-2 bg-gray-900 rounded-full overflow-hidden border border-gray-800 mx-auto">
-                <div id="progress-bar" class="h-full bg-neonBlue w-0 transition-all duration-[2000ms] ease-out shadow-[0_0_10px_#00f3ff]"></div>
+<nav id="navbar" class="fixed w-full z-40 top-0 border-b border-white/5 bg-black/80 backdrop-blur-md transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <div class="flex items-center space-x-3 group cursor-pointer sfx-hover">
+                <i class="fa-solid fa-crow text-3xl text-neonBlue group-hover:text-neonPurple transition-colors duration-300"></i>
+                <span class="font-orbitron text-2xl font-bold tracking-widest text-white">KUZGUN</span>
             </div>
-            <p class="mt-4 font-rajdhani text-neonBlue text-sm tracking-[0.3em] uppercase animate-bounce">Sistem Yükleniyor...</p>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-8">
+                    <a href="#hero" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonBlue transition-colors tracking-wider">ANA ÜS</a>
+                    <a href="#hardware" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonBlue transition-colors tracking-wider">DONANIM</a>
+                    <a href="#games" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonBlue transition-colors tracking-wider">KÜTÜPHANE</a>
+                    <a href="#dashboard" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonBlue transition-colors tracking-wider">VERİ MERKEZİ</a>
+                    <a href="#community" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonBlue transition-colors tracking-wider">TOPLULUK</a>
+                    <a href="#fuel" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonGreen transition-colors tracking-wider">MENÜ</a>
+                    <a href="#pricing" class="sfx-click nav-link font-orbitron text-sm text-gray-300 hover:text-neonRed transition-colors tracking-wider">TARİFE</a>
+                </div>
+            </div>
+            <button class="md:hidden text-white text-xl"><i class="fa-solid fa-bars"></i></button>
         </div>
     </div>
+</nav>
 
-    <!-- NAVBAR -->
-    <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-md border-b border-white/5 bg-black/50" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex items-center space-x-2 group cursor-pointer">
-                    <i class="fa-solid fa-crow text-3xl text-neonBlue group-hover:text-neonPurple transition-colors duration-300"></i>
-                    <span class="font-orbitron text-2xl font-bold tracking-wider text-white">KUZGUN</span>
+<header id="hero" class="relative min-h-screen flex flex-col items-center justify-center pt-20 px-4 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-darkBg z-0"></div>
+    
+    <div class="relative z-10 text-center max-w-5xl mx-auto">
+        <div class="inline-flex items-center space-x-2 mb-6 px-4 py-1 border border-neonBlue/30 rounded-full bg-neonBlue/10 backdrop-blur-sm animate-pulse">
+            <div class="w-2 h-2 bg-neonBlue rounded-full"></div>
+            <span class="text-neonBlue font-rajdhani font-bold tracking-[0.2em] text-xs md:text-sm">SYSTEM STATUS: ONLINE // VER 2.1</span>
+        </div>
+        
+        <h1 class="font-orbitron text-5xl md:text-8xl font-black text-white mb-6 leading-tight">
+            <span class="block neon-text-blue">SINIRLARI</span>
+            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-neonBlue via-white to-neonPurple glitch-text">YOK ET</span>
+        </h1>
+        
+        <p class="font-rajdhani text-lg md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto font-light">
+            Şehrin en gelişmiş E-Spor kompleksi. <span class="text-white font-semibold">360Hz</span> yenileme hızı, <span class="text-white font-semibold">1ms</span> gecikme, sınırsız adrenalin.
+        </p>
+
+        <div class="mb-12 p-6 bg-black/40 border border-neonRed/30 rounded-lg backdrop-blur-sm max-w-3xl mx-auto">
+            <div class="flex items-center justify-center mb-4 space-x-2">
+                <i class="fa-solid fa-skull-crossbones text-neonRed animate-pulse"></i>
+                <h3 class="text-neonRed font-orbitron tracking-widest text-sm md:text-base">TURNUVA GERİ SAYIMI: KIŞ SEZONU FİNALİ</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4 md:gap-8 font-orbitron text-white">
+                <div class="flex flex-col items-center">
+                    <div id="days" class="text-3xl md:text-6xl font-bold neon-text-red">00</div>
+                    <span class="text-xs text-gray-500 tracking-wider mt-1">GÜN</span>
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#home" class="font-orbitron text-sm hover:text-neonBlue transition-colors duration-300 tracking-widest">ANA ÜS</a>
-                        <a href="#games" class="font-orbitron text-sm hover:text-neonBlue transition-colors duration-300 tracking-widest">OYUNLAR</a>
-                        <a href="#hardware" class="font-orbitron text-sm hover:text-neonBlue transition-colors duration-300 tracking-widest">DONANIM</a>
-                        <a href="#pricing" class="font-orbitron text-sm hover:text-neonBlue transition-colors duration-300 tracking-widest">TARİFE</a>
-                        <button onclick="scrollToContact()" class="bg-transparent border border-neonRed text-neonRed px-4 py-1 font-orbitron text-sm hover:bg-neonRed hover:text-white transition-all duration-300 skew-x-[-15deg]">
-                            <span class="skew-x-[15deg] block">REZERVASYON</span>
+                <div class="flex flex-col items-center">
+                    <div id="hours" class="text-3xl md:text-6xl font-bold neon-text-red">00</div>
+                    <span class="text-xs text-gray-500 tracking-wider mt-1">SAAT</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div id="minutes" class="text-3xl md:text-6xl font-bold neon-text-red">00</div>
+                    <span class="text-xs text-gray-500 tracking-wider mt-1">DAKİKA</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button class="sfx-click btn-glitch relative px-8 py-4 bg-neonBlue text-black font-orbitron font-bold text-lg tracking-wider hover:scale-105 transition-transform skew-x-[-12deg]">
+                <span class="block skew-x-[12deg]">REZERVASYON YAP</span>
+            </button>
+            
+            <a href="#hardware" class="sfx-click block text-center relative px-8 py-4 border border-white text-white font-orbitron font-bold text-lg tracking-wider hover:bg-white hover:text-black transition-all skew-x-[-12deg]">
+                <span class="block skew-x-[12deg]">DONANIMI GÖR</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<section id="hardware" class="py-20 bg-black relative border-t border-gray-900">
+    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+                <h2 class="font-orbitron text-4xl font-bold text-white mb-2">SAVAŞ İSTASYONU</h2>
+                <div class="h-1 w-24 bg-neonBlue shadow-[0_0_10px_#00f3ff]"></div>
+            </div>
+            <p class="font-rajdhani text-neonBlue mt-4 md:mt-0 text-lg tracking-widest border border-neonBlue/30 px-4 py-1 rounded bg-neonBlue/5">
+                <i class="fa-solid fa-microchip mr-2"></i> SPECS_V.4.0
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div class="hud-panel p-6 group hover:bg-white/5 transition-colors">
+                <div class="hud-corner tl !border-neonGreen"></div><div class="hud-corner br !border-neonGreen"></div>
+                <div class="text-neonGreen text-4xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-memory"></i>
+                </div>
+                <h3 class="font-orbitron text-xl text-white mb-1">GRAFİK BİRİMİ</h3>
+                <p class="font-rajdhani text-3xl font-bold text-gray-300 mb-2">RTX 4090</p>
+                <div class="w-full bg-gray-800 h-1 mt-4">
+                    <div class="bg-neonGreen h-1 w-[95%] shadow-[0_0_10px_#39ff14]"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 font-mono">24GB GDDR6X // 384-BIT</p>
+            </div>
+
+            <div class="hud-panel p-6 group hover:bg-white/5 transition-colors">
+                <div class="hud-corner tr !border-neonRed"></div><div class="hud-corner bl !border-neonRed"></div>
+                <div class="text-neonRed text-4xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <h3 class="font-orbitron text-xl text-white mb-1">İŞLEMCİ</h3>
+                <p class="font-rajdhani text-3xl font-bold text-gray-300 mb-2">i9 14900K</p>
+                <div class="w-full bg-gray-800 h-1 mt-4">
+                    <div class="bg-neonRed h-1 w-[90%] shadow-[0_0_10px_#ff003c]"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 font-mono">6.0 GHz // 24 ÇEKİRDEK</p>
+            </div>
+
+            <div class="hud-panel p-6 group hover:bg-white/5 transition-colors">
+                <div class="hud-corner tl !border-neonBlue"></div><div class="hud-corner tr !border-neonBlue"></div>
+                <div class="text-neonBlue text-4xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-desktop"></i>
+                </div>
+                <h3 class="font-orbitron text-xl text-white mb-1">EKRAN</h3>
+                <p class="font-rajdhani text-3xl font-bold text-gray-300 mb-2">ZOWIE XL2566K</p>
+                <div class="w-full bg-gray-800 h-1 mt-4">
+                    <div class="bg-neonBlue h-1 w-[100%] shadow-[0_0_10px_#00f3ff]"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 font-mono">360Hz // DYAC+ // 0.5MS</p>
+            </div>
+
+            <div class="hud-panel p-6 group hover:bg-white/5 transition-colors">
+                <div class="hud-corner bl !border-neonPurple"></div><div class="hud-corner br !border-neonPurple"></div>
+                <div class="text-neonPurple text-4xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-keyboard"></i>
+                </div>
+                <h3 class="font-orbitron text-xl text-white mb-1">EKİPMAN</h3>
+                <p class="font-rajdhani text-3xl font-bold text-gray-300 mb-2">PRO SERİSİ</p>
+                <div class="w-full bg-gray-800 h-1 mt-4">
+                    <div class="bg-neonPurple h-1 w-[85%] shadow-[0_0_10px_#bc13fe]"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 font-mono">LOGITECH G PRO X SUPERLIGHT</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section id="games" class="py-16 bg-darkBg border-t border-gray-900 overflow-hidden">
+    <div class="container mx-auto px-4 mb-8">
+        <h2 class="font-orbitron text-3xl font-bold text-white text-center">
+            <span class="text-neonPurple">OYUN</span> KÜTÜPHANESİ
+        </h2>
+        <p class="text-center text-gray-500 font-rajdhani text-sm tracking-widest mt-2">TÜM OYUNLAR ULTRA AYARLARDA OYNANABİLİR</p>
+    </div>
+
+    <div class="marquee-wrapper">
+        <div class="marquee-content">
+            <div class="game-card group cursor-pointer">
+                <img src="https://store-images.s-microsoft.com/image/apps.21507.13663857844271189.4c1de202-3961-4c40-a0aa-7f4f1388775a.20ed7782-0eda-4f9d-b421-4cc47492edc6" alt="Valorant">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonRed text-lg">VALORANT</h4>
+                    <span class="text-xs text-white bg-red-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+            <div class="game-card group cursor-pointer">
+                <img src="https://cdn.fastly.steamstatic.com/apps/csgo/images/csgo_react/social/cs2.jpg" alt="CS2">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonYellow text-lg">CS 2</h4>
+                    <span class="text-xs text-black bg-neonYellow px-1 rounded">FPS</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://egamersworld.com/cdn-cgi/image/width=690,quality=75,format=webp/uploads/blog/1/17/1735564816859_1735564816859.webp" alt="LoL">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonBlue text-lg">LEAGUE OF LEGENDS</h4>
+                    <span class="text-xs text-white bg-blue-600 px-1 rounded">MOBA</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_616x353.jpg?t=1748630546" alt="Elden Ring">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-orange-400 text-lg">ELDEN RING</h4>
+                    <span class="text-xs text-white bg-orange-600 px-1 rounded">RPG</span>
+                </div>
+            </div>
+
+             <div class="game-card group cursor-pointer">
+                <img src="https://upload.wikimedia.org/wikipedia/tr/b/be/Grand_Theft_Auto_V_oyununun_kapa%C4%9F%C4%B1.jpg" alt="GTA V">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-green-400 text-lg">GTA V</h4>
+                    <span class="text-xs text-white bg-green-600 px-1 rounded">OPEN WORLD</span>
+                </div>
+            </div>
+            
+             <div class="game-card group cursor-pointer">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2669320/86a267ec44fc57124127eba46f25120813374317/capsule_616x353.jpg?t=1752681627" alt="FC 25">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-white text-lg">FC 25</h4>
+                    <span class="text-xs text-black bg-white px-1 rounded">SPORT</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQAbEmty8FO1hZi88Lq4HkUMB-jV8MnBew_Q&s" alt="Point Blank">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonRed text-lg">Point Blank</h4>
+                    <span class="text-xs text-white bg-red-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+            <div class="game-card group cursor-pointer">
+                <img src="https://cdn1.epicgames.com/spt-assets/53ec4985296b4facbe3a8d8d019afba9/pubg-battlegrounds-19vwb.jpg" alt="PUBG">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonYellow text-lg">PUBG</h4>
+                    <span class="text-xs text-black bg-neonYellow px-1 rounded">BATTLE ROYALE</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202503/2819/346190abf755e3883d1353fbc8d8ccb7e1acf076f1138d6b.jpg" alt="WarZone">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonBlue text-lg">CoD: WARZONE</h4>
+                    <span class="text-xs text-white bg-blue-600 px-1 rounded">BATTLE ROYALE</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202507/2514/054ff23fde43c010f63ed99eb1fca6957c26d2b136a9294d.jpg" alt="BATTLEFIELD 6">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-orange-400 text-lg">BATTLEFIELD 6</h4>
+                    <span class="text-xs text-white bg-orange-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+
+             <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202508/2119/bc712bd54dbcc672cf8bf5c1ea3ac37dd2e4727366add2be.png" alt="BLACK OPS 7">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-green-400 text-lg">CoD: BLACK OPS 7</h4>
+                    <span class="text-xs text-white bg-green-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+             <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202510/2209/38365f38f0f888403f83866d6f4d56ceccf993cb43336f5c.jpg" alt="WAR THUNDER">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-white text-lg">WAR THUNDER</h4>
+                    <span class="text-xs text-black bg-white px-1 rounded">WAR</span>
+                </div>
+            </div>
+            <div class="game-card group cursor-pointer">
+                <img src="https://store-images.s-microsoft.com/image/apps.21507.13663857844271189.4c1de202-3961-4c40-a0aa-7f4f1388775a.20ed7782-0eda-4f9d-b421-4cc47492edc6" alt="Valorant">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonRed text-lg">VALORANT</h4>
+                    <span class="text-xs text-white bg-red-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+            <div class="game-card group cursor-pointer">
+                <img src="https://cdn.fastly.steamstatic.com/apps/csgo/images/csgo_react/social/cs2.jpg" alt="CS2">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonYellow text-lg">CS 2</h4>
+                    <span class="text-xs text-black bg-neonYellow px-1 rounded">FPS</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://egamersworld.com/cdn-cgi/image/width=690,quality=75,format=webp/uploads/blog/1/17/1735564816859_1735564816859.webp" alt="LoL">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonBlue text-lg">LEAGUE OF LEGENDS</h4>
+                    <span class="text-xs text-white bg-blue-600 px-1 rounded">MOBA</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_616x353.jpg?t=1748630546" alt="Elden Ring">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-orange-400 text-lg">ELDEN RING</h4>
+                    <span class="text-xs text-white bg-orange-600 px-1 rounded">RPG</span>
+                </div>
+            </div>
+
+             <div class="game-card group cursor-pointer">
+                <img src="https://upload.wikimedia.org/wikipedia/tr/b/be/Grand_Theft_Auto_V_oyununun_kapa%C4%9F%C4%B1.jpg" alt="GTA V">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-green-400 text-lg">GTA V</h4>
+                    <span class="text-xs text-white bg-green-600 px-1 rounded">OPEN WORLD</span>
+                </div>
+            </div>
+            
+             <div class="game-card group cursor-pointer">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2669320/86a267ec44fc57124127eba46f25120813374317/capsule_616x353.jpg?t=1752681627" alt="FC 25">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-white text-lg">FC 25</h4>
+                    <span class="text-xs text-black bg-white px-1 rounded">SPORT</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQAbEmty8FO1hZi88Lq4HkUMB-jV8MnBew_Q&s" alt="Point Blank">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonRed text-lg">Point Blank</h4>
+                    <span class="text-xs text-white bg-red-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+            <div class="game-card group cursor-pointer">
+                <img src="https://cdn1.epicgames.com/spt-assets/53ec4985296b4facbe3a8d8d019afba9/pubg-battlegrounds-19vwb.jpg" alt="PUBG">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonYellow text-lg">PUBG</h4>
+                    <span class="text-xs text-black bg-neonYellow px-1 rounded">BATTLE ROYALE</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202503/2819/346190abf755e3883d1353fbc8d8ccb7e1acf076f1138d6b.jpg" alt="WarZone">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-neonBlue text-lg">CoD: WARZONE</h4>
+                    <span class="text-xs text-white bg-blue-600 px-1 rounded">BATTLE ROYALE</span>
+                </div>
+            </div>
+
+            <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202507/2514/054ff23fde43c010f63ed99eb1fca6957c26d2b136a9294d.jpg" alt="BATTLEFIELD 6">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-orange-400 text-lg">BATTLEFIELD 6</h4>
+                    <span class="text-xs text-white bg-orange-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+
+             <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202508/2119/bc712bd54dbcc672cf8bf5c1ea3ac37dd2e4727366add2be.png" alt="BLACK OPS 7">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-green-400 text-lg">CoD: BLACK OPS 7</h4>
+                    <span class="text-xs text-white bg-green-600 px-1 rounded">FPS</span>
+                </div>
+            </div>
+            
+             <div class="game-card group cursor-pointer">
+                <img src="https://image.api.playstation.com/vulcan/ap/rnd/202510/2209/38365f38f0f888403f83866d6f4d56ceccf993cb43336f5c.jpg" alt="WAR THUNDER">
+                <div class="game-overlay">
+                    <h4 class="font-orbitron text-white text-lg">WAR THUNDER</h4>
+                    <span class="text-xs text-black bg-white px-1 rounded">WAR</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<section id="dashboard" class="py-20 bg-darkBg border-t border-gray-900 relative">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-8">
+            <div>
+                <h2 class="font-orbitron text-3xl md:text-4xl font-bold text-white mb-2">CANLI VERİ MERKEZİ</h2>
+                <p class="font-rajdhani text-gray-400">Anlık sunucu durumu ve oyuncu yoğunluğu.</p>
+            </div>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-neonGreen rounded-full animate-pulse"></div>
+                    <span class="text-xs font-orbitron text-neonGreen">SYSTEM OPTIMAL</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-wifi text-neonBlue text-xs"></i>
+                    <span class="text-xs font-orbitron text-neonBlue">PING: 4ms</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 hud-panel p-6">
+                <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
+                <div class="hud-corner bl"></div><div class="hud-corner br"></div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-orbitron text-lg text-neonBlue">AĞ TRAFİĞİ & OYUNCU SAYISI</h3>
+                    <div class="text-xs font-rajdhani text-gray-500 border border-gray-700 px-2 py-1 rounded">CANLI AKIŞ</div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="serverChart"></canvas>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="hud-panel p-6 flex items-center justify-between">
+                    <div class="hud-corner tl !border-neonPurple"></div>
+                    <div>
+                        <p class="text-gray-400 font-rajdhani text-sm uppercase tracking-wider">Aktif Masa</p>
+                        <h4 class="text-4xl font-orbitron text-white font-bold">42<span class="text-lg text-gray-600">/50</span></h4>
+                    </div>
+                    <i class="fa-solid fa-desktop text-4xl text-neonPurple opacity-80"></i>
+                </div>
+
+                <div class="hud-panel p-6 flex items-center justify-between">
+                    <div class="hud-corner tr !border-neonGreen"></div>
+                    <div>
+                        <p class="text-gray-400 font-rajdhani text-sm uppercase tracking-wider">İnternet Hızı</p>
+                        <h4 class="text-4xl font-orbitron text-white font-bold">10<span class="text-lg text-neonGreen">Gbps</span></h4>
+                    </div>
+                    <i class="fa-solid fa-bolt text-4xl text-neonGreen opacity-80"></i>
+                </div>
+
+                <div class="hud-panel p-6 flex items-center justify-between">
+                    <div class="hud-corner bl !border-neonRed"></div>
+                    <div>
+                        <p class="text-gray-400 font-rajdhani text-sm uppercase tracking-wider">Sıcaklık (Ort)</p>
+                        <h4 class="text-4xl font-orbitron text-white font-bold">21<span class="text-lg text-gray-600">°C</span></h4>
+                    </div>
+                    <i class="fa-solid fa-temperature-low text-4xl text-neonRed opacity-80"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="community" class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#00f3ff 1px, transparent 1px), linear-gradient(90deg, #00f3ff 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="font-orbitron text-4xl font-bold text-white mb-2">TOPLULUK MERKEZİ</h2>
+            <div class="h-1 w-24 bg-neonPurple mx-auto rounded-full shadow-[0_0_10px_#bc13fe]"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="hud-panel p-6 flex flex-col h-full">
+                <div class="hud-corner tl !border-neonYellow"></div><div class="hud-corner tr !border-neonYellow"></div>
+                <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-trophy text-neonYellow text-2xl animate-float"></i>
+                        <h3 class="font-orbitron text-xl text-white">HALL OF FAME</h3>
+                    </div>
+                    <span class="text-neonYellow font-rajdhani text-sm tracking-widest bg-neonYellow/10 px-2 py-1 rounded">HAFTANIN MVP'LERİ</span>
+                </div>
+
+                <div class="flex-grow space-y-4" id="hof-container">
+                    </div>
+            </div>
+
+            <div class="hud-panel p-1 h-[400px] relative group">
+                <div class="hud-corner bl !border-neonRed"></div><div class="hud-corner br !border-neonRed"></div>
+                
+                <div class="absolute top-4 left-4 z-20 flex items-center space-x-2 bg-black/60 backdrop-blur px-3 py-1 rounded border border-neonRed/30">
+                    <div class="w-2 h-2 bg-neonRed rounded-full animate-pulse"></div>
+                    <span class="text-neonRed font-orbitron text-xs tracking-widest font-bold">CANLI YAYIN</span>
+                </div>
+                <div class="absolute top-4 right-4 z-20 text-white font-rajdhani text-xs bg-black/60 px-2 py-1 rounded">
+                    <i class="fa-regular fa-eye mr-1"></i> 1.4K İZLEYİCİ
+                </div>
+
+                <div class="relative w-full h-full overflow-hidden bg-black">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" alt="Stream Feed">
+                    <div class="absolute top-10 left-10 w-8 h-8 border-l-2 border-t-2 border-white/30"></div>
+                    <div class="absolute top-10 right-10 w-8 h-8 border-r-2 border-t-2 border-white/30"></div>
+                    <div class="absolute bottom-10 left-10 w-8 h-8 border-l-2 border-b-2 border-white/30"></div>
+                    <div class="absolute bottom-10 right-10 w-8 h-8 border-r-2 border-b-2 border-white/30"></div>
+                    
+                    <div class="absolute inset-0 bg-neonRed/5 pointer-events-none"></div>
+                    
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="sfx-click w-16 h-16 bg-neonRed/90 rounded-full flex items-center justify-center text-white text-2xl hover:scale-110 transition shadow-[0_0_20px_#ff003c]">
+                            <i class="fa-solid fa-play ml-1"></i>
                         </button>
                     </div>
                 </div>
-                <div class="-mr-2 flex md:hidden">
-                    <button type="button" class="text-gray-300 hover:text-white focus:outline-none p-2" onclick="toggleMobileMenu()">
-                        <i class="fa-solid fa-bars text-2xl"></i>
+                
+                <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/80 to-transparent z-10">
+                    <h4 class="text-white font-orbitron text-lg">KUZGUN ARENA TV</h4>
+                    <p class="text-gray-400 font-rajdhani text-sm">Valorant Kış Turnuvası - Yarı Final Maçı</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="fuel" class="py-20 bg-black relative">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="font-orbitron text-4xl font-bold text-white mb-2 neon-text-green">GAMER FUEL</h2>
+            <p class="font-rajdhani text-neonGreen tracking-[0.3em] text-sm">ENVANTERİNİ DOLDUR, SAVAŞA DEVAM ET</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="inventory-grid">
+            </div>
+    </div>
+</section>
+
+<section id="pricing" class="py-24 bg-darkBg relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl border-x border-white/5 pointer-events-none"></div>
+    <div class="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-neonBlue/20 to-transparent"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center mb-20">
+            <h2 class="font-orbitron text-5xl font-black text-white mb-4 tracking-tighter">ERİŞİM <span class="text-transparent bg-clip-text bg-gradient-to-r from-neonBlue to-neonPurple">PROTOKOLLERİ</span></h2>
+            <p class="font-rajdhani text-gray-400 text-lg max-w-2xl mx-auto">Savaş istasyonunuzu seçin. Tüm paketlerde 1000Mbps fiber internet standarttır.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto items-center">
+            
+            <div class="group relative h-full">
+                <div class="absolute inset-0 bg-gradient-to-b from-gray-800 to-black opacity-80 skew-y-2 border border-gray-700 transition-all duration-300 group-hover:border-gray-500"></div>
+                <div class="relative p-8 h-full flex flex-col backdrop-blur-sm bg-gray-900/50 border-t-4 border-gray-500 hover:-translate-y-2 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span class="font-orbitron text-gray-400 text-sm tracking-[0.2em]">SEVİYE 1</span>
+                        <h3 class="font-orbitron text-3xl text-white font-bold mt-1">SCOUT</h3>
+                        <div class="w-12 h-1 bg-gray-500 mt-4"></div>
+                    </div>
+                    
+                    <div class="flex items-baseline mb-8">
+                        <span class="text-5xl font-orbitron font-bold text-white">35₺</span>
+                        <span class="ml-2 font-rajdhani text-gray-400">/ SAAT</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8 font-rajdhani text-lg text-gray-300 flex-grow">
+                        <li class="flex items-center"><i class="fa-solid fa-microchip w-8 text-gray-500"></i> i5 12400F İşlemci</li>
+                        <li class="flex items-center"><i class="fa-solid fa-memory w-8 text-gray-500"></i> RTX 3060 Ti</li>
+                        <li class="flex items-center"><i class="fa-solid fa-desktop w-8 text-gray-500"></i> 165Hz Monitör</li>
+                        <li class="flex items-center text-gray-600 line-through"><i class="fa-solid fa-ban w-8"></i> VIP Oda Erişimi</li>
+                    </ul>
+                    
+                    <button class="w-full py-4 border border-gray-600 text-white font-orbitron font-bold tracking-wider hover:bg-gray-700 hover:border-gray-500 transition-all uppercase group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        Erişim Sağla
                     </button>
                 </div>
             </div>
-        </div>
-        <!-- Mobile Menu -->
-        <div class="md:hidden hidden bg-black/95 backdrop-blur-xl border-b border-neonBlue/30" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center">
-                <a href="#home" class="block px-3 py-2 text-base font-orbitron hover:text-neonBlue">ANA ÜS</a>
-                <a href="#games" class="block px-3 py-2 text-base font-orbitron hover:text-neonBlue">OYUNLAR</a>
-                <a href="#hardware" class="block px-3 py-2 text-base font-orbitron hover:text-neonBlue">DONANIM</a>
-                <a href="#pricing" class="block px-3 py-2 text-base font-orbitron hover:text-neonBlue">TARİFE</a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- HERO SECTION -->
-    <header id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <!-- Arka plan görseli karanlık ve neon -->
-            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop" alt="Gaming Setup" class="w-full h-full object-cover opacity-20">
-            <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-darkBg"></div>
-        </div>
-
-        <div class="relative z-10 text-center px-4">
-            <div class="inline-block mb-4 px-4 py-1 border border-neonBlue/50 rounded-full bg-neonBlue/10 backdrop-blur-sm">
-                <span class="text-neonBlue font-rajdhani font-bold tracking-[0.2em] text-sm">SYSTEM STATUS: ONLINE</span>
-            </div>
-            
-            <h1 class="font-orbitron text-6xl md:text-9xl font-black text-white mb-6 relative">
-                <span class="absolute top-1 left-1 w-full h-full text-neonRed opacity-50 blur-[2px] animate-pulse">KUZGUN</span>
-                <span class="relative z-10">KUZGUN</span>
-            </h1>
-            
-            <p class="font-rajdhani text-xl md:text-3xl text-gray-300 mb-10 max-w-3xl mx-auto neon-text-blue font-light">
-                GERÇEKLİK SINIRINI AŞ. <br>
-                <span class="text-white font-bold">YÜKSEK PERFORMANS. EŞSİZ ATMOSFER.</span>
-            </p>
-            
-            <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
-                <a href="#games" class="btn-glitch relative px-8 py-4 bg-neonBlue text-black font-orbitron font-bold text-lg tracking-wider skew-x-[-10deg] hover:scale-105 transition-transform">
-                    <span class="skew-x-[10deg] block">OYUNA BAŞLA</span>
-                </a>
-                <a href="#pricing" class="relative px-8 py-4 border border-white text-white font-orbitron font-bold text-lg tracking-wider skew-x-[-10deg] hover:bg-white hover:text-black transition-all">
-                    <span class="skew-x-[10deg] block">FİYATLAR</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce">
-            <span class="text-xs font-rajdhani tracking-[0.3em] text-gray-400 mb-2">AŞAĞI KAYDIR</span>
-            <i class="fa-solid fa-chevron-down text-neonBlue"></i>
-        </div>
-    </header>
-
-    <!-- DONANIM (HARDWARE) SECTION -->
-    <section id="hardware" class="py-20 relative bg-darkBg">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-wrap items-center">
-                <!-- Sol Taraf: Görsel ve HUD -->
-                <div class="w-full lg:w-1/2 mb-12 lg:mb-0 relative">
-                    <div class="relative z-10 hud-panel p-2">
-                        <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
-                        <div class="hud-corner bl"></div><div class="hud-corner br"></div>
-                        <img src="https://www.asus.com/event/pcdiy/tr/assets/img/builds/ModArtPc_3080White_1000x800.JPG" alt="High End PC" class="w-full h-auto object-cover opacity-90">
-                    </div>
-                    <!-- Dekoratif Arka Plan Elemanları -->
-                    <div class="absolute -top-10 -left-10 w-32 h-32 border-l-4 border-t-4 border-neonPurple opacity-50"></div>
-                </div>
-
-                <!-- Sağ Taraf: Özellikler -->
-                <div class="w-full lg:w-1/2 lg:pl-16">
-                    <h2 class="font-orbitron text-4xl md:text-5xl font-bold mb-6">
-                        <span class="text-neonPurple">SİLAHINI</span> SEÇ
-                    </h2>
-                    <p class="font-rajdhani text-lg text-gray-400 mb-8 leading-relaxed">
-                        Kuzgun E-Spor, en yeni nesil donanımlarla donatılmıştır. Gecikme yok, FPS düşüşü yok. Sadece saf performans ve akıcılık.
-                    </p>
-
-                    <div class="space-y-6">
-                        <!-- Spec Item -->
-                        <div class="flex items-center p-4 border border-gray-800 bg-gray-900/50 hover:border-neonBlue transition-colors duration-300">
-                            <i class="fa-solid fa-microchip text-4xl text-neonBlue mr-6"></i>
-                            <div>
-                                <h3 class="font-orbitron text-xl font-bold text-white">RTX 4090 SERİSİ</h3>
-                                <p class="font-rajdhani text-gray-400">Ultra Gerçekçi Ray Tracing</p>
-                            </div>
-                        </div>
-                        <!-- Spec Item -->
-                        <div class="flex items-center p-4 border border-gray-800 bg-gray-900/50 hover:border-neonPurple transition-colors duration-300">
-                            <i class="fa-solid fa-desktop text-4xl text-neonPurple mr-6"></i>
-                            <div>
-                                <h3 class="font-orbitron text-xl font-bold text-white">360Hz MONİTÖRLER</h3>
-                                <p class="font-rajdhani text-gray-400">0.5ms Gecikme Süresi</p>
-                            </div>
-                        </div>
-                         <!-- Spec Item -->
-                         <div class="flex items-center p-4 border border-gray-800 bg-gray-900/50 hover:border-neonRed transition-colors duration-300">
-                            <i class="fa-solid fa-chair text-4xl text-neonRed mr-6"></i>
-                            <div>
-                                <h3 class="font-orbitron text-xl font-bold text-white">PROFESYONEL EKİPMAN</h3>
-                                <p class="font-rajdhani text-gray-400">Mekanik Klavye, Hafif Mouse, Oyuncu Koltuğu</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- OYUNLAR (GAMES) SECTION -->
-    <section id="games" class="py-20 bg-black relative">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="font-orbitron text-4xl md:text-5xl font-bold text-white mb-2 neon-text-blue">OYUN KÜTÜPHANESİ</h2>
-                <div class="h-1 w-24 bg-neonBlue mx-auto"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Game Card 1 -->
-                <div class="game-card group relative h-96 overflow-hidden border border-gray-800 bg-gray-900 cursor-pointer">
-                    <img src="https://www.talkesport.com/wp-content/uploads/Valorant-vs-CS2-696x356.webp" alt="FPS Games" class="game-card-img w-full h-full object-cover opacity-60 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
-                    
-                    <div class="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="text-neonRed text-xs font-orbitron font-bold tracking-widest mb-1">FPS / REKABETÇİ</div>
-                        <h3 class="text-2xl font-bold font-orbitron text-white mb-2">VALORANT / CS2</h3>
-                        <p class="text-gray-400 text-sm font-rajdhani opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            En düşük ping, en yüksek fps ile rakiplerinden bir adım önde ol.
-                        </p>
-                    </div>
-                    <div class="absolute top-4 right-4 bg-neonRed text-black text-xs font-bold px-2 py-1 transform skew-x-[-10deg]">
-                        TURNUVA AKTİF
-                    </div>
-                </div>
-
-                <!-- Game Card 2 -->
-                <div class="game-card group relative h-96 overflow-hidden border border-gray-800 bg-gray-900 cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop" alt="MOBA Games" class="game-card-img w-full h-full object-cover opacity-60 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
-                    
-                    <div class="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="text-neonBlue text-xs font-orbitron font-bold tracking-widest mb-1">MOBA</div>
-                        <h3 class="text-2xl font-bold font-orbitron text-white mb-2">LOL / DOTA 2</h3>
-                        <p class="text-gray-400 text-sm font-rajdhani opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            Sihirdar vadisinde takımınla zafere ulaş.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Game Card 3 -->
-                <div class="game-card group relative h-96 overflow-hidden border border-gray-800 bg-gray-900 cursor-pointer">
-                    <img src="https://staticg.sportskeeda.com/editor/2024/11/2940c-17311440779243-1920.jpg?w=640" alt="Sports Games" class="game-card-img w-full h-full object-cover opacity-60 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
-                    
-                    <div class="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="text-green-400 text-xs font-orbitron font-bold tracking-widest mb-1">SPOR</div>
-                        <h3 class="text-2xl font-bold font-orbitron text-white mb-2">FC 25 / NBA 2K</h3>
-                        <p class="text-gray-400 text-sm font-rajdhani opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            Arkadaşlarınla konsol keyfi veya PC rekabeti.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Game Card 4 -->
-                <div class="game-card group relative h-96 overflow-hidden border border-gray-800 bg-gray-900 cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=1000&auto=format&fit=crop" alt="Battle Royale" class="game-card-img w-full h-full object-cover opacity-60 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
-                    
-                    <div class="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <div class="text-yellow-400 text-xs font-orbitron font-bold tracking-widest mb-1">BATTLE ROYALE</div>
-                        <h3 class="text-2xl font-bold font-orbitron text-white mb-2">WARZONE / APEX</h3>
-                        <p class="text-gray-400 text-sm font-rajdhani opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            Hayatta kalan son kişi ol.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ÜCRET TARİFESİ (PRICING) SECTION -->
-    <section id="pricing" class="py-20 relative overflow-hidden">
-        <!-- Decoration background -->
-        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-900/10 to-transparent"></div>
-
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
-                <div>
-                    <h2 class="font-orbitron text-4xl md:text-5xl font-bold text-white neon-text-purple">ERİŞİM PAKETLERİ</h2>
-                    <p class="text-gray-400 font-rajdhani mt-2">Zamanını seç, maceraya başla.</p>
-                </div>
-                <!-- Interactive Toggle (Visual Only) -->
-                <div class="flex items-center space-x-4 mt-4 md:mt-0 bg-gray-900 p-2 rounded-lg border border-gray-700">
-                    <span class="text-sm font-orbitron text-gray-400">STANDART</span>
-                    <div class="w-12 h-6 bg-neonBlue rounded-full relative cursor-pointer shadow-[0_0_10px_#00f3ff]">
-                        <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-                    </div>
-                    <span class="text-sm font-orbitron text-white">VIP ÜYELİK</span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Pricing Card 1 -->
-                <div class="hud-panel p-8 flex flex-col items-center text-center group">
-                    <div class="hud-corner tl"></div><div class="hud-corner tr"></div><div class="hud-corner bl"></div><div class="hud-corner br"></div>
-                    
-                    <h3 class="font-orbitron text-2xl font-bold text-gray-300 mb-4">1 SAAT</h3>
-                    <div class="text-4xl font-bold font-orbitron text-white mb-2">₺35<span class="text-sm text-gray-500">.00</span></div>
-                    
-                    <ul class="font-rajdhani text-gray-400 space-y-3 mb-8 w-full">
-                        <li class="border-b border-gray-800 pb-2">Standart PC Erişimi</li>
-                        <li class="border-b border-gray-800 pb-2">Temel Ekipmanlar</li>
-                        <li class="border-b border-gray-800 pb-2 text-gray-600">İçecek İkramı Yok</li>
-                    </ul>
-                    
-                    <button class="w-full py-2 border border-gray-500 text-gray-300 hover:border-white hover:text-white font-orbitron transition-all">SEÇ</button>
-                </div>
-
-                <!-- Pricing Card 2 (Featured) -->
-                <div class="hud-panel p-8 flex flex-col items-center text-center transform md:-translate-y-4 border-neonBlue shadow-[0_0_20px_rgba(0,243,255,0.1)]">
-                    <div class="absolute top-0 bg-neonBlue text-black font-bold font-orbitron text-xs px-4 py-1 skew-x-[-10deg]">EN POPÜLER</div>
-                    <div class="hud-corner tl !border-neonBlue"></div><div class="hud-corner tr !border-neonBlue"></div>
-                    <div class="hud-corner bl !border-neonBlue"></div><div class="hud-corner br !border-neonBlue"></div>
-                    
-                    <h3 class="font-orbitron text-3xl font-bold text-neonBlue mb-4 mt-2">5 SAAT + 1</h3>
-                    <div class="text-5xl font-bold font-orbitron text-white mb-2 neon-text-blue">₺150<span class="text-sm text-gray-500">.00</span></div>
-                    
-                    <ul class="font-rajdhani text-gray-300 space-y-3 mb-8 w-full">
-                        <li class="border-b border-gray-700 pb-2"><i class="fa-solid fa-check text-neonBlue mr-2"></i>VIP PC Erişimi</li>
-                        <li class="border-b border-gray-700 pb-2"><i class="fa-solid fa-check text-neonBlue mr-2"></i>Profesyonel Ekipman</li>
-                        <li class="border-b border-gray-700 pb-2"><i class="fa-solid fa-check text-neonBlue mr-2"></i>1 İçecek İkramı</li>
-                    </ul>
-                    
-                    <button class="w-full py-3 bg-neonBlue text-black font-bold font-orbitron hover:bg-white transition-all shadow-[0_0_15px_#00f3ff]">PAKETİ YÜKLE</button>
-                </div>
-
-                <!-- Pricing Card 3 -->
-                <div class="hud-panel p-8 flex flex-col items-center text-center group">
-                    <div class="hud-corner tl !border-neonPurple"></div><div class="hud-corner tr !border-neonPurple"></div>
-                    <div class="hud-corner bl !border-neonPurple"></div><div class="hud-corner br !border-neonPurple"></div>
-                    
-                    <h3 class="font-orbitron text-2xl font-bold text-neonPurple mb-4">GÜNLÜK KAPATMA</h3>
-                    <div class="text-4xl font-bold font-orbitron text-white mb-2">₺300<span class="text-sm text-gray-500">.00</span></div>
-                    
-                    <ul class="font-rajdhani text-gray-400 space-y-3 mb-8 w-full">
-                        <li class="border-b border-gray-800 pb-2">10 Saat VIP Erişim</li>
-                        <li class="border-b border-gray-800 pb-2">Özel Loca İmkanı</li>
-                        <li class="border-b border-gray-800 pb-2">Yemek Menüsü İndirimi</li>
-                    </ul>
-                    
-                    <button class="w-full py-2 border border-neonPurple text-neonPurple hover:bg-neonPurple hover:text-white font-orbitron transition-all">SEÇ</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER / CONTACT -->
-    <footer class="bg-black pt-16 pb-8 border-t border-gray-900 relative">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-1">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i class="fa-solid fa-crow text-2xl text-neonBlue"></i>
-                        <span class="font-orbitron text-xl font-bold text-white">KUZGUN</span>
-                    </div>
-                    <p class="text-gray-500 font-rajdhani">
-                        Şehrin en gelişmiş E-Spor ve oyun merkezi. Takımını topla, savaşa katıl.
-                    </p>
-                </div>
+            <div class="group relative transform md:-translate-y-4">
+                <div class="absolute -inset-1 bg-gradient-to-r from-neonBlue via-cyan-500 to-neonBlue opacity-30 blur-lg group-hover:opacity-60 transition duration-500"></div>
                 
-                <div>
-                    <h4 class="font-orbitron text-white font-bold mb-4">NAVİGASYON</h4>
-                    <ul class="space-y-2 font-rajdhani text-gray-400">
-                        <li><a href="#" class="hover:text-neonBlue transition">Ana Sayfa</a></li>
-                        <li><a href="#" class="hover:text-neonBlue transition">Oyunlar</a></li>
-                        <li><a href="#" class="hover:text-neonBlue transition">Turnuvalar</a></li>
-                        <li><a href="#" class="hover:text-neonBlue transition">Kariyer</a></li>
-                    </ul>
-                </div>
+                <div class="relative bg-black border border-neonBlue p-1">
+                    <div class="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-neonBlue"></div>
+                    <div class="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-neonBlue"></div>
+                    <div class="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-neonBlue"></div>
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-neonBlue"></div>
 
-                <div>
-                    <h4 class="font-orbitron text-white font-bold mb-4">İLETİŞİM</h4>
-                    <ul class="space-y-2 font-rajdhani text-gray-400">
-                        <li><i class="fa-solid fa-location-dot mr-2 text-neonRed"></i> Merkez Mah. Oyun Sk. No:1</li>
-                        <li><i class="fa-solid fa-phone mr-2 text-neonBlue"></i> +90 555 000 0000</li>
-                        <li><i class="fa-solid fa-envelope mr-2 text-neonPurple"></i> info@kuzgunespor.com</li>
-                    </ul>
-                </div>
+                    <div class="bg-gray-900/90 p-8 relative overflow-hidden">
+                        <div class="absolute top-6 right-0 bg-neonBlue text-black font-orbitron text-xs font-bold px-3 py-1 skew-x-[-15deg] translate-x-2">
+                            ÇOK SATAN
+                        </div>
 
-                <div>
-                    <h4 class="font-orbitron text-white font-bold mb-4">TAKİP ET</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-neonBlue hover:shadow-[0_0_10px_#00f3ff] transition-all"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="w-10 h-10 rounded border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-neonBlue hover:shadow-[0_0_10px_#00f3ff] transition-all"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#" class="w-10 h-10 rounded border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-neonBlue hover:shadow-[0_0_10px_#00f3ff] transition-all"><i class="fa-brands fa-discord"></i></a>
+                        <div class="mb-6 text-center">
+                            <i class="fa-solid fa-crown text-4xl text-neonBlue mb-4 drop-shadow-[0_0_10px_#00f3ff]"></i>
+                            <h3 class="font-orbitron text-4xl text-white font-black mt-1 glitch-text" data-text="VETERAN">VETERAN</h3>
+                            <p class="font-rajdhani text-neonBlue text-sm tracking-widest mt-2 border-b border-neonBlue/30 pb-4">REKABETÇİ SEÇİMİ</p>
+                        </div>
+                        
+                        <div class="flex justify-center items-baseline mb-8">
+                            <span class="text-6xl font-orbitron font-bold text-white text-shadow-blue">150₺</span>
+                            <span class="ml-2 font-rajdhani text-gray-400">/ 5 SAAT</span>
+                        </div>
+                        
+                        <ul class="space-y-4 mb-8 font-rajdhani text-lg text-white">
+                            <li class="flex items-center border-b border-gray-800 pb-2"><i class="fa-solid fa-microchip w-8 text-neonBlue"></i> i9 13900K İşlemci</li>
+                            <li class="flex items-center border-b border-gray-800 pb-2"><i class="fa-solid fa-memory w-8 text-neonBlue"></i> RTX 4080 Super</li>
+                            <li class="flex items-center border-b border-gray-800 pb-2"><i class="fa-solid fa-desktop w-8 text-neonBlue"></i> 240Hz Zowie Monitör</li>
+                            <li class="flex items-center text-neonBlue font-bold"><i class="fa-solid fa-gift w-8 animate-pulse"></i> +1 İçecek Hediye</li>
+                        </ul>
+                        
+                        <button class="sfx-click relative w-full overflow-hidden group/btn">
+                            <div class="absolute inset-0 w-full h-full bg-neonBlue translate-y-full transition-transform duration-300 group-hover/btn:translate-y-0"></div>
+                            <div class="relative py-4 bg-transparent border-2 border-neonBlue text-neonBlue font-orbitron font-bold tracking-wider uppercase transition-colors duration-300 group-hover/btn:text-black">
+                                SAVAŞA BAŞLA
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
-            
-            <div class="text-center pt-8 border-t border-gray-900">
-                <p class="font-rajdhani text-gray-600 text-sm">© 2024 KUZGUN E-SPOR. Tüm hakları saklıdır. <span class="text-neonBlue">System ver. 2.0</span></p>
+
+            <div class="group relative h-full">
+                <div class="absolute inset-0 bg-gradient-to-b from-purple-900 to-black opacity-80 skew-y-[-2deg] border border-purple-900 transition-all duration-300 group-hover:border-neonPurple"></div>
+                <div class="relative p-8 h-full flex flex-col backdrop-blur-sm bg-gray-900/50 border-t-4 border-neonPurple hover:-translate-y-2 transition-transform duration-300">
+                    <div class="mb-6">
+                        <span class="font-orbitron text-neonPurple text-sm tracking-[0.2em]">SEVİYE 99</span>
+                        <h3 class="font-orbitron text-3xl text-white font-bold mt-1">WARLORD</h3>
+                        <div class="w-12 h-1 bg-neonPurple mt-4 shadow-[0_0_10px_#bc13fe]"></div>
+                    </div>
+                    
+                    <div class="flex items-baseline mb-8">
+                        <span class="text-5xl font-orbitron font-bold text-white">300₺</span>
+                        <span class="ml-2 font-rajdhani text-gray-400">/ GÜNLÜK</span>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8 font-rajdhani text-lg text-gray-300 flex-grow">
+                        <li class="flex items-center"><i class="fa-solid fa-skull w-8 text-neonPurple"></i> Özel VIP Oda (Loca)</li>
+                        <li class="flex items-center"><i class="fa-solid fa-memory w-8 text-neonPurple"></i> RTX 4090 OC Edition</li>
+                        <li class="flex items-center"><i class="fa-solid fa-desktop w-8 text-neonPurple"></i> 360Hz Alienware</li>
+                        <li class="flex items-center text-neonPurple"><i class="fa-solid fa-infinity w-8"></i> Sınırsız İçecek</li>
+                    </ul>
+                    
+                    <button class="w-full py-4 border border-neonPurple text-neonPurple font-orbitron font-bold tracking-wider hover:bg-neonPurple hover:text-white transition-all uppercase group-hover:shadow-[0_0_20px_#bc13fe]">
+                        VIP Giriş
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<footer class="bg-black py-10 border-t border-gray-900 text-center relative z-10">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-center space-x-2 mb-4">
+            <i class="fa-solid fa-crow text-2xl text-neonBlue"></i>
+            <span class="font-orbitron text-2xl font-bold text-white">KUZGUN</span>
+        </div>
+        <p class="font-rajdhani text-gray-500 text-sm mb-6">Merkez Mah. Oyun Sk. No:1 • +90 555 000 0000</p>
+        <div class="flex justify-center space-x-6">
+            <a href="#" class="text-gray-400 hover:text-neonBlue transition"><i class="fa-brands fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-neonBlue transition"><i class="fa-brands fa-twitter text-xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-neonBlue transition"><i class="fa-brands fa-discord text-xl"></i></a>
+        </div>
+    </div>
+</footer>
+
+<div id="lootBoxContainer" class="fixed bottom-24 right-6 z-50 cursor-pointer transition-all duration-500 transform translate-y-32">
+    <div class="relative w-20 h-20 group">
+        <div id="lootClosed" class="absolute inset-0 flex items-center justify-center transition-all duration-300">
+            <i class="fa-solid fa-box text-5xl text-neonYellow drop-shadow-[0_0_15px_rgba(255,240,31,0.6)] group-hover:scale-110 shake-box"></i>
+            <div class="absolute -top-2 -right-2 bg-neonRed text-white font-bold text-xs px-2 py-1 rounded skew-x-[-10deg] animate-pulse">AÇ!</div>
+        </div>
+        <div id="lootOpen" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-500 pointer-events-none">
+            <div class="text-center bg-black/90 border border-neonYellow p-4 rounded min-w-[200px] absolute right-0 bottom-0">
+                <h4 class="text-neonYellow font-orbitron font-bold text-sm mb-1">TEBRİKLER!</h4>
+                <p id="lootRewardText" class="text-white font-rajdhani text-xs">...</p>
             </div>
         </div>
-    </footer>
+    </div>
+</div>
 
-    <!-- SCRIPTS -->
-    <script>
-        // --- 1. LOADER & ENTRANCE ANIMATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const loader = document.getElementById('loader');
-            const progressBar = document.getElementById('progress-bar');
-            
-            // Simüle edilmiş yükleme çubuğu
-            setTimeout(() => {
-                progressBar.style.width = '100%';
-            }, 100);
+<button id="sfxToggle" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full border border-gray-600 bg-black/80 text-gray-500 hover:text-neonBlue hover:border-neonBlue hover:shadow-[0_0_10px_#00f3ff] transition-all flex items-center justify-center">
+    <i class="fa-solid fa-volume-xmark text-lg" id="sfxIcon"></i>
+</button>
 
-            // Yükleme tamamlandığında
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 800);
-            }, 2000); // 2 saniye yükleme simülasyonu
+<audio id="audioClick" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto" volume="0.1"></audio>
+<audio id="audioHover" src="https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3" preload="auto" volume="0.2"></audio>
+<audio id="audioLoot" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto" volume="0.1"></audio>
+
+<script>
+    // --- DATA & STATE MANAGEMENT ---
+    const gameState = {
+        hof: [
+            { rank: 1, name: "ShadowSlayer", game: "Valorant", score: "2450 LP", avatar: "fa-user-astronaut", color: "text-neonYellow" },
+            { rank: 2, name: "CyberNinja", game: "LoL", score: "1100 LP", avatar: "fa-robot", color: "text-gray-400" },
+            { rank: 3, name: "AimBot_TR", game: "CS2", score: "Global", avatar: "fa-user-secret", color: "text-neonRed" },
+            { rank: 4, name: "Kuzgun_Admin", game: "Dota 2", score: "Immortal", avatar: "fa-crown", color: "text-neonBlue" }
+        ],
+        inventory: [
+            { name: "STAMINA POTION", desc: "Filtre Kahve", price: "40₺", icon: "fa-mug-hot", color: "text-orange-400" },
+            { name: "MANA BOOST", desc: "Enerji İçeceği", price: "60₺", icon: "fa-bolt", color: "text-neonYellow" },
+            { name: "TANK MEAL", desc: "Dev Burger", price: "180₺", icon: "fa-burger", color: "text-red-500" },
+            { name: "PARTY BUFF", desc: "Pizza (XL)", price: "220₺", icon: "fa-pizza-slice", color: "text-yellow-500" },
+            { name: "SNACK LOOT", desc: "Cips Tabağı", price: "50₺", icon: "fa-cookie-bite", color: "text-yellow-200" },
+            { name: "LOCKED", desc: "VIP Üyelere Özel", price: "???", icon: "fa-lock", color: "text-gray-600", locked: true }
+        ],
+        rewards: [
+            "%10 İndirim Kodu: KUZGUN10",
+            "+1 Saat Hediye!",
+            "Bedava Kahve Kuponu",
+            "Gece Paketi %20 İndirim"
+        ],
+        sfxEnabled: false,
+        lootOpened: false
+    };
+
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        initBackgroundCanvas();
+        renderHOF();
+        renderInventory();
+        initCountdown();
+        initChart();
+        setupInteractions();
+        
+        // Show Loot Box after delay
+        setTimeout(() => {
+            document.getElementById('lootBoxContainer').classList.remove('translate-y-32');
+        }, 3000);
+    });
+
+    // --- RENDER FUNCTIONS ---
+    
+    function renderHOF() {
+        const container = document.getElementById('hof-container');
+        gameState.hof.forEach(player => {
+            const item = document.createElement('div');
+            item.className = "flex items-center justify-between p-3 bg-white/5 border-l-2 hover:bg-white/10 transition cursor-pointer sfx-hover";
+            item.style.borderColor = player.rank === 1 ? '#fff01f' : (player.rank === 2 ? '#9ca3af' : (player.rank === 3 ? '#ff003c' : '#00f3ff'));
+            item.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <span class="font-orbitron font-bold text-lg ${player.color}">#${player.rank}</span>
+                    <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/50">
+                        <i class="fa-solid ${player.avatar} text-white"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-white font-rajdhani tracking-wide">${player.name}</div>
+                        <div class="text-xs text-gray-500 font-orbitron">${player.game}</div>
+                    </div>
+                </div>
+                <div class="font-orbitron text-sm font-bold ${player.color}">${player.score}</div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function renderInventory() {
+        const container = document.getElementById('inventory-grid');
+        gameState.inventory.forEach(item => {
+            const el = document.createElement('div');
+            el.className = `inv-item aspect-square flex flex-col items-center justify-center p-2 text-center group cursor-pointer sfx-hover ${item.locked ? 'opacity-50' : ''}`;
+            el.innerHTML = `
+                <i class="fa-solid ${item.icon} text-3xl mb-2 ${item.color} group-hover:scale-110 transition-transform"></i>
+                <h4 class="font-orbitron text-xs text-white font-bold mb-1">${item.name}</h4>
+                <p class="font-rajdhani text-[10px] text-gray-400">${item.desc}</p>
+                ${!item.locked ? `<span class="mt-2 text-neonGreen font-bold font-orbitron text-xs">${item.price}</span>` : ''}
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    // --- CHART.JS IMPLEMENTATION ---
+    function initChart() {
+        const ctx = document.getElementById('serverChart').getContext('2d');
+        
+        // Gradient fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(0, 243, 255, 0.5)');
+        gradient.addColorStop(1, 'rgba(0, 243, 255, 0)');
+
+        const serverChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10s', '9s', '8s', '7s', '6s', '5s', '4s', '3s', '2s', 'Şimdi'],
+                datasets: [{
+                    label: 'Sunucu Yükü (%)',
+                    data: [45, 48, 42, 50, 55, 60, 58, 52, 49, 53],
+                    borderColor: '#00f3ff',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: { family: 'Orbitron' },
+                        bodyFont: { family: 'Rajdhani' },
+                        borderColor: '#00f3ff',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#6b7280', font: { family: 'Rajdhani' } },
+                        min: 0,
+                        max: 100
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#6b7280', font: { family: 'Rajdhani' } }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
         });
 
-        // --- 2. CANVAS PARTICLE BACKGROUND (The "Game Universe" Effect) ---
-        const canvas = document.getElementById('bg-canvas');
+        // Simulate Live Data
+        setInterval(() => {
+            const newData = Math.floor(Math.random() * (65 - 40 + 1) + 40);
+            serverChart.data.datasets[0].data.shift();
+            serverChart.data.datasets[0].data.push(newData);
+            serverChart.update('none'); // 'none' for performance
+        }, 1000);
+    }
+
+    // --- COUNTDOWN LOGIC ---
+    function initCountdown() {
+        // Set date to 14 days from now
+        const target = new Date();
+        target.setDate(target.getDate() + 14);
+
+        function update() {
+            const now = new Date().getTime();
+            const diff = target - now;
+            
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById('days').innerText = d < 10 ? '0'+d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0'+m : m;
+        }
+        setInterval(update, 1000);
+        update();
+    }
+
+    // --- INTERACTIONS & SFX ---
+    function setupInteractions() {
+        // SFX Toggle
+        const toggle = document.getElementById('sfxToggle');
+        const icon = document.getElementById('sfxIcon');
+        const clickSound = document.getElementById('audioClick');
+        const hoverSound = document.getElementById('audioHover');
+        const lootSound = document.getElementById('audioLoot');
+
+        toggle.addEventListener('click', () => {
+            gameState.sfxEnabled = !gameState.sfxEnabled;
+            if(gameState.sfxEnabled) {
+                icon.classList.remove('fa-volume-xmark');
+                icon.classList.add('fa-volume-high');
+                toggle.classList.add('border-neonGreen', 'text-neonGreen');
+                clickSound.play().catch(e => {}); // Check browser autoplay policy
+            } else {
+                icon.classList.add('fa-volume-xmark');
+                icon.classList.remove('fa-volume-high');
+                toggle.classList.remove('border-neonGreen', 'text-neonGreen');
+            }
+        });
+
+        // SFX Listeners
+        document.querySelectorAll('.sfx-click').forEach(el => {
+            el.addEventListener('click', () => {
+                if(gameState.sfxEnabled) {
+                    clickSound.currentTime = 0;
+                    clickSound.play();
+                }
+            });
+        });
+        document.querySelectorAll('.sfx-hover').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if(gameState.sfxEnabled) {
+                    hoverSound.currentTime = 0;
+                    hoverSound.play();
+                }
+            });
+        });
+
+        // Loot Box Logic
+        const lootBox = document.getElementById('lootBoxContainer');
+        lootBox.addEventListener('click', () => {
+            if(gameState.lootOpened) return;
+            
+            gameState.lootOpened = true;
+            if(gameState.sfxEnabled) lootSound.play();
+
+            const reward = gameState.rewards[Math.floor(Math.random() * gameState.rewards.length)];
+            document.getElementById('lootRewardText').innerText = reward;
+
+            document.getElementById('lootClosed').style.opacity = '0';
+            document.getElementById('lootOpen').style.opacity = '1';
+            document.getElementById('lootOpen').style.transform = 'scale(1)';
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                lootBox.classList.add('translate-y-32', 'opacity-0');
+            }, 5000);
+        });
+    }
+
+    // --- BACKGROUND VISUALS (Canvas) ---
+    function initBackgroundCanvas() {
+        const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
-
-        let width, height;
-        let particles = [];
-
-        // Neon renk paleti
-        const colors = ['#00f3ff', '#bc13fe', '#ff003c'];
-
-        function resize() {
+        
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-        }
+        });
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 1.5; // Hız
-                this.vy = (Math.random() - 0.5) * 1.5;
-                this.size = Math.random() * 2;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.life = Math.random() * 100;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Kenarlardan sekme
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-                
-                // Fare ile etkileşim (Basit)
-                // Daha karmaşık etkileşimler performansı düşürebilir, bu yüzden minimal tutuyoruz
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const particleCount = window.innerWidth < 768 ? 40 : 80; // Mobilde daha az parçacık
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
+        const particles = [];
+        for(let i=0; i<50; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 2,
+                color: Math.random() > 0.5 ? '#00f3ff' : '#bc13fe'
+            });
         }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            // Parçacıkları çiz
-            particles.forEach((p, index) => {
-                p.update();
-                p.draw();
-
-                // Yakın parçacıkları birleştir (Ağ efekti)
-                for (let j = index + 1; j < particles.length; j++) {
-                    const p2 = particles[j];
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if(p.x < 0) p.x = width;
+                if(p.x > width) p.x = 0;
+                if(p.y < 0) p.y = height;
+                if(p.y > height) p.y = 0;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                
+                // Draw connections
+                particles.forEach(p2 => {
                     const dx = p.x - p2.x;
                     const dy = p.y - p2.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < 150) {
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 100) {
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${1 - dist / 150})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.shadowBlur = 0; // Performans için çizgilerde shadow yok
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${1 - dist/100})`;
+                        ctx.lineWidth = 0.2;
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(p2.x, p2.y);
                         ctx.stroke();
                     }
-                }
+                });
             });
-
+            
             requestAnimationFrame(animate);
         }
-
-        window.addEventListener('resize', () => {
-            resize();
-            initParticles();
-        });
-
-        resize();
-        initParticles();
         animate();
-
-        // --- 3. NAVBAR SCROLL EFFECT ---
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('bg-black/90', 'shadow-lg', 'shadow-neonBlue/10');
-            } else {
-                navbar.classList.remove('bg-black/90', 'shadow-lg', 'shadow-neonBlue/10');
-            }
-        });
-
-        // --- 4. MOBILE MENU TOGGLE ---
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // --- 5. SMOOTH SCROLL ---
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-                // Mobilde menüyü kapat
-                document.getElementById('mobile-menu').classList.add('hidden');
-            });
-        });
-
-        function scrollToContact() {
-            document.querySelector('footer').scrollIntoView({ behavior: 'smooth' });
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
